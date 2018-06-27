@@ -119,7 +119,7 @@ class BoxMarkup(Html, Markup):
                 yield span.type
                 yield '</sup>'
             yield '</span>'
-            
+
             previous = stop
         yield self.text[previous:]
         yield '<div>'
@@ -149,14 +149,14 @@ class LineMarkup(Html, Markup):
                 color = LINE[line.type]
                 yield (
                     '<span style="'
-	            'border-bottom: 2px solid {color}; '
-	            'padding-bottom: {padding}px'
+                    'border-bottom: 2px solid {color}; '
+                    'padding-bottom: {padding}px'
                     '">'.format(
                         padding=padding,
                         color=color
                     )
                 )
-            yield self.text[start:stop]            
+            yield self.text[start:stop]
             for _ in multi.lines:
                 yield '</span>'
 
@@ -185,15 +185,15 @@ class LineLabelMarkup(Html, Markup):
             else:
                 yield (
                     '<span style="'
-	            'border-bottom: 2px solid {color}; '
-	            'padding-bottom: 1px'
+                    'border-bottom: 2px solid {color}; '
+                    'padding-bottom: 1px'
                     '">'.format(
                         color=Soft.BLUE
                     )
                 )
                 yield text
                 yield '</span>'
-            
+
                 yield (
                     '<span style="'
                     'display: inline-block; '
@@ -265,7 +265,7 @@ class AsciiMarkup(Ascii, Markup):
                     index += 1
                 else:
                     break
-            
+
             yield line.replace('\t', ' ')
 
             if slices:
@@ -289,8 +289,9 @@ class AsciiMarkup(Ascii, Markup):
                             size = line.stop - line.start
                             space = width - (slice.start - start)
                             type = line.type[:min(size, space)]
-                                
+
                             for x, char in enumerate(type):
-                                matrix[line.level][slice.start - start + x] = char
+                                x = slice.start - start + x
+                                matrix[line.level][x] = char
                 for row in matrix:
                     yield ''.join(row)

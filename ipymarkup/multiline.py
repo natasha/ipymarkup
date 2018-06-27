@@ -56,7 +56,7 @@ def get_multilines(spans):
         selected = intervals.search(start, stop)
         level = get_free_level(selected)
         intervals.addi(start, stop, Line(start, stop, type, level))
-    
+
     # chunk
     intervals.split_overlaps()
 

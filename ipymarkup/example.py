@@ -47,7 +47,7 @@ def generate_cases():
     text = 'a a a b b c c c'
     spans = list(generate_spans(text))
     yield text, spans
-    
+
     text = 'a a a b b c e d d d f f g g h'
     spans = list(generate_spans(text))
     yield text, spans
@@ -105,7 +105,7 @@ def generate_table():
     yield generate_header()
     for case in generate_cases():
         yield generate_row(case)
-        
+
 
 def format_table(rows):
     yield '<table>'
