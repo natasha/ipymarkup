@@ -1,6 +1,7 @@
 # ipymarkup
 
 NER markup visualisation for Jupyter Notebook. 
+<img src="table.png"/>
 
 # Install
 
@@ -25,6 +26,20 @@ spans = [
 ]
 LineMarkup(text, spans)
 
+```
+<img src="output.png"/>
+
+```python
+from ipymarkup import AsciiMarkup
+
+AsciiMarkup(text, spans)
+
+```
+```
+a d a b a a a b c c c f d
+a------------   c---- f  
+  d----------------------
+      b--------          
 ```
 
 
