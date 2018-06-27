@@ -1,4 +1,4 @@
-# ipymarkup
+# ipymarkup [![Build Status](https://travis-ci.org/natasha/ipymarkup.svg?branch=master)](https://travis-ci.org/natasha/ipymarkup)
 
 NER markup visualisation for Jupyter Notebook. 
 <img src="table.png"/>
