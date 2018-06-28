@@ -3,5 +3,5 @@ python:
   - "2.7"
   - "3.5"
 script:
-  - sed -i '' 's/kernelspec//' docs.ipynb test.ipynb
+  - sed -i 's/kernelspec//' docs.ipynb test.ipynb
   - pytest --nbval --cov ipymarkup --cov-report term-missing -v test.ipynb docs.ipynb
