@@ -1,5 +1,7 @@
 .cache
 .ipynb_checkpoints
 .coverage
+coverage.xml
 __pycache__
 *.egg-info
+*.pyc

@@ -1,7 +1,9 @@
 language: python
 python:
   - "2.7"
+  - "3.3"
   - "3.5"
+  - "3.6"
 script:
-  - sed -i 's/kernelspec//' docs.ipynb test.ipynb
-  - pytest --nbval --cov ipymarkup --cov-report term-missing -v test.ipynb docs.ipynb
+  - sed -i 's/kernelspec//' test.ipynb
+  - pytest --pep8 ipymarkup --nbval --cov ipymarkup --cov-report xml -v test.ipynb

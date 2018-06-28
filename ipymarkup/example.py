@@ -1,4 +1,5 @@
-
+# coding: utf-8
+from __future__ import unicode_literals
 
 from .utils import Record
 from .markup import Ascii, Html

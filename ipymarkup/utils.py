@@ -1,3 +1,6 @@
+# coding: utf-8
+from __future__ import unicode_literals
+
 
 def assert_type(item, types):
     if not isinstance(item, types):

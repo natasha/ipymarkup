@@ -1,6 +1,9 @@
+# coding: utf-8
+from __future__ import unicode_literals
 
-import textwrap
+from textwrap import TextWrapper
 
+from .compat import str, range
 from .utils import Record, assert_type
 from .multiline import Multiline, get_multilines
 from .color import (
@@ -220,10 +223,10 @@ class LineLabelMarkup(Html, Markup):
         yield '<div>'
 
 
-class Wrapper(textwrap.TextWrapper):
+class Wrapper(TextWrapper):
     def __init__(self, width):
-        super(Wrapper, self).__init__(
-            width,
+        TextWrapper.__init__(
+            self, width,
             expand_tabs=False,
             replace_whitespace=False,
             drop_whitespace=False
