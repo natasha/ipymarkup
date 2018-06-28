@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ipymarkup',
-    version='0.1.0',
+    version='0.2.0',
     description='NER markup visualisation for Jupyter Notebook',
     url='https://github.com/natasha/ipymarkup',
     author='Alexander Kukushkin',
