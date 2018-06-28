@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from textwrap import TextWrapper
+from cgi import escape
 
 from .compat import str, range
 from .utils import Record, assert_type
@@ -78,20 +79,38 @@ class Markup(Record):
         self.multilines = list(get_multilines(self.spans))
 
 
+def chunk_(text, spans):
+    previous = 0
+    for span in spans:
+        start, stop, _ = span
+        yield text[previous:start], None
+        yield text[start:stop], span
+        previous = stop
+    yield text[previous:], None
+
+
+def chunk(text, spans):
+    for chunk, span in chunk_(text, spans):
+        yield escape(chunk), span
+
+
 class BoxMarkup(Html, Markup):
     label = False
     color = True
 
     @property
     def as_html(self):
-        yield '<div style="white-space: pre-wrap">'
-        previous = 0
-        for span in self.spans:
-            start, stop, type = span
-            yield self.text[previous:start]
+        yield (
+            '<div class="tex2jax_ignore" '
+            'style="white-space: pre-wrap">'
+        )
+        for text, span in chunk(self.text, self.spans):
+            if not span:
+                yield text
+                continue
 
             if self.color:
-                background = BACKGROUND[type]
+                background = BACKGROUND[span.type]
                 border = DARKER[background]
                 label = EVEN_DARKER[background]
             else:
@@ -109,7 +128,7 @@ class BoxMarkup(Html, Markup):
                     border=border
                 )
             )
-            yield self.text[start:stop]
+            yield text
             if self.label and span.type:
                 yield (
                     '<sup style="'
@@ -122,9 +141,6 @@ class BoxMarkup(Html, Markup):
                 yield span.type
                 yield '</sup>'
             yield '</span>'
-
-            previous = stop
-        yield self.text[previous:]
         yield '<div>'
 
 
@@ -137,15 +153,15 @@ class LineMarkup(Html, Markup):
     @property
     def as_html(self):
         yield (
-            '<div style="'
+            '<div class="tex2jax_ignore" style="'
             'line-height: 1.6em; '
             'white-space: pre-wrap'
             '">'
         )
-        previous = 0
-        for multi in self.multilines:
-            start, stop, _ = multi
-            yield self.text[previous:start]
+        for text, multi in chunk(self.text, self.multilines):
+            if not multi:
+                yield text
+                continue
 
             for line in multi.lines:
                 padding = 1 + line.level * 3
@@ -159,12 +175,10 @@ class LineMarkup(Html, Markup):
                         color=color
                     )
                 )
-            yield self.text[start:stop]
+            yield text
             for _ in multi.lines:
                 yield '</span>'
 
-            previous = stop
-        yield self.text[previous:]
         yield '<div>'
 
 
@@ -177,49 +191,46 @@ class LineLabelMarkup(Html, Markup):
             'white-space: pre-wrap'
             '">'
         )
-        previous = 0
-        for multi in self.multilines:
-            start, stop, _ = multi
-            yield self.text[previous:start]
+        for text, multi in chunk(self.text, self.multilines):
+            if not multi:
+                yield text
+                continue
 
-            text = self.text[start:stop]
             if not text.strip():
                 yield text
-            else:
-                yield (
-                    '<span style="'
-                    'border-bottom: 2px solid {color}; '
-                    'padding-bottom: 1px'
-                    '">'.format(
-                        color=Soft.BLUE
-                    )
-                )
-                yield text
-                yield '</span>'
+                continue
 
-                yield (
-                    '<span style="'
-                    'display: inline-block; '
-                    'margin-left: 1px; '
-                    'font-size: 7px;'
-                    '">'
+            yield (
+                '<span style="'
+                'border-bottom: 2px solid {color}; '
+                'padding-bottom: 1px'
+                '">'.format(
+                    color=Soft.BLUE
                 )
-                types = [
-                    _.type
-                    for _ in multi.lines
-                    if _.type is not None
-                ]
-                if len(types) == 1:
-                    yield types[0]
-                elif len(types) > 1:
-                    for line in multi.lines:
-                        yield '<span style="display: block; height: 7px;">'
-                        yield line.type
-                        yield '</span>'
-                yield '</span>'
+            )
+            yield text
+            yield '</span>'
 
-            previous = stop
-        yield self.text[previous:]
+            yield (
+                '<span style="'
+                'display: inline-block; '
+                'margin-left: 1px; '
+                'font-size: 7px;'
+                '">'
+            )
+            types = [
+                _.type
+                for _ in multi.lines
+                if _.type is not None
+            ]
+            if len(types) == 1:
+                yield types[0]
+            elif len(types) > 1:
+                for line in multi.lines:
+                    yield '<span style="display: block; height: 7px;">'
+                    yield line.type
+                    yield '</span>'
+            yield '</span>'
         yield '<div>'
 
 
@@ -292,7 +303,6 @@ class AsciiMarkup(Ascii, Markup):
                             size = line.stop - line.start
                             space = width - (slice.start - start)
                             type = line.type[:min(size, space)]
-
                             for x, char in enumerate(type):
                                 x = slice.start - start + x
                                 matrix[line.level][x] = char
