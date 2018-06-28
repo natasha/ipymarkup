@@ -5,7 +5,7 @@ NER markup visualisation for Jupyter Notebook.
 
 # Install
 
-`ipymarkup` supports both Python 2.7+ / 3.3+.
+`ipymarkup` supports both Python 2.7+ / 3.4+, ascii version should support 2.7+ / 3.3+, PyPy but not tested
 
 ```bash
 $ pip install ipymarkup
