@@ -5,7 +5,7 @@ NER markup visualisation for Jupyter Notebook.
 
 # Install
 
-`ipymarkup` supports both Python 2.7+ / 3.4+, ascii version should support 2.7+ / 3.3+, PyPy but not tested
+`ipymarkup` supports both Python 2.7+ / 3.4+, ascii version should work on 2.7+ / 3.3+, PyPy but not tested
 
 ```bash
 $ pip install ipymarkup
@@ -14,7 +14,7 @@ $ pip install ipymarkup
 # Usage
 
 ```python
-from ipymarkup import Span, LineMarkup
+from ipymarkup import Span, AsciiMarkup
 
 text = 'a d a b a a a b c c c f d'
 spans = [
@@ -24,14 +24,6 @@ spans = [
     Span(16, 21, 'c'),
     Span(22, 23, 'f'),
 ]
-LineMarkup(text, spans)
-
-```
-<img src="output.png"/>
-
-```python
-from ipymarkup import AsciiMarkup
-
 AsciiMarkup(text, spans)
 
 ```
