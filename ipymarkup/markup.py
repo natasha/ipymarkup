@@ -141,7 +141,7 @@ class BoxMarkup(Html, Markup):
                 yield span.type
                 yield '</sup>'
             yield '</span>'
-        yield '<div>'
+        yield '</div>'
 
 
 class BoxLabelMarkup(BoxMarkup):
@@ -179,7 +179,7 @@ class LineMarkup(Html, Markup):
             for _ in multi.lines:
                 yield '</span>'
 
-        yield '<div>'
+        yield '</div>'
 
 
 class LineLabelMarkup(Html, Markup):
@@ -231,7 +231,7 @@ class LineLabelMarkup(Html, Markup):
                     yield line.type
                     yield '</span>'
             yield '</span>'
-        yield '<div>'
+        yield '</div>'
 
 
 class Wrapper(TextWrapper):
