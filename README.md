@@ -3,7 +3,7 @@
 NER markup visualization for Jupyter Notebook. 
 <img src="table.png"/>
 
-# Install
+## Install
 
 `ipymarkup` supports both Python 2.7+ / 3.4+, non Jupyter functionality should work on 2.7+ / 3.3+, PyPy but not tested
 
@@ -11,7 +11,7 @@ NER markup visualization for Jupyter Notebook.
 $ pip install ipymarkup
 ```
 
-# Usage
+## Usage
 
 ```python
 from ipymarkup import Span, AsciiMarkup
@@ -37,11 +37,11 @@ a------------   c---- f
 
 For more examples and explanation see [ipymarkup documentation](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb).
 
-# License
+## License
 
 Source code of `ipymarkup` is distributed under MIT license (allows modification and commercial usage)
 
-# Support
+## Support
 
 - Chat — https://telegram.me/natural_language_processing
 - Issues — https://github.com/natasha/ipymarkup/issues
