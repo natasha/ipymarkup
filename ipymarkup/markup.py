@@ -37,7 +37,7 @@ class Span(Record):
             raise ValueError('expected start < stop')
         self.start = start
         self.stop = stop
-        self.type = type
+        self.type = str(type)
 
     def __lt__(self, other):
         if self.start != other.start:
@@ -73,9 +73,9 @@ class Markup(Record):
 
     def __init__(self, text, spans):
         self.text = str(text)
-        self.spans = sorted(spans)
-        for span in self.spans:
+        for span in spans:
             assert_type(span, Span)
+        self.spans = sorted(spans)
         self.multilines = list(get_multilines(self.spans))
 
 
