@@ -37,7 +37,9 @@ class Span(Record):
             raise ValueError('expected start < stop')
         self.start = start
         self.stop = stop
-        self.type = str(type)
+        if type is not None:
+            type = str(type)
+        self.type = type
 
     def __lt__(self, other):
         if self.start != other.start:
