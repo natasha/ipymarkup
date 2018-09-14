@@ -14,6 +14,21 @@ $ pip install ipymarkup
 ## Usage
 
 ```python
+from ipymarkup import markup, AsciiMarkup
+
+text = '0123456789'
+spans = [
+    (1, 2),
+    (4, 7, 'b')
+]
+markup(text, spans, AsciiMarkup)
+```
+```
+0123456789
+ -  b--   
+```
+
+```python
 from ipymarkup import Span, AsciiMarkup
 
 text = 'a d a b a a a b c c c f d'

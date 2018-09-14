@@ -24,6 +24,9 @@ __all__ = [
     'LineMarkup',
     'LineLabelMarkup',
     'AsciiMarkup',
+
+    'markup',
+    'show_markup'
 ]
 
 
@@ -310,3 +313,35 @@ class AsciiMarkup(Ascii, Markup):
                                 matrix[line.level][x] = char
                 for row in matrix:
                     yield ''.join(row)
+
+
+def prepare_span(span):
+    if isinstance(span, Span):
+        return span
+
+    start, stop, type = None, None, None
+    if isinstance(span, (tuple, list)):
+        if len(span) == 2:
+            start, stop = span
+        elif len(span) == 3:
+            start, stop, type = span
+    else:
+        start = getattr(span, 'start', None)
+        stop = getattr(span, 'stop', None)
+        type = getattr(span, 'type', None)
+
+    if isinstance(start, int) and isinstance(stop, int):
+        return Span(start, stop, type)
+
+    raise TypeError(span)
+
+
+def markup(text, spans, Markup=BoxLabelMarkup):
+    spans = [prepare_span(_) for _ in spans]
+    return Markup(text, spans)
+
+
+def show_markup(text, spans, Markup=BoxLabelMarkup):
+    from IPython.display import display
+
+    display(markup(text, spans, Markup))
