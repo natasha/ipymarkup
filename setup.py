@@ -33,7 +33,7 @@ For more examples and explanation see `ipymarkup documentation <http://nbviewer.
 
 setup(
     name='ipymarkup',
-    version='0.2.3',
+    version='0.3.0',
     description='NER markup visualisation for Jupyter Notebook',
     long_description=description,
     long_description_content_type='text/x-rst',
