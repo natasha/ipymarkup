@@ -43,7 +43,7 @@ show_markup(text, spans)
 ```
 <img src="i/02.png" width="60%"/>
 
-There is a number of visualizations (see [docs](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb) for full list). By default, `BoxLabelMarkup` is used. In case spans overlap (`PERSON` overlaps `NAME`), switch to `LineMarkup`:
+There is a number of visualizations (see [docs](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb#Visualizations) for full list). By default, `BoxLabelMarkup` is used. In case spans overlap (`PERSON` overlaps `NAME`), switch to `LineMarkup`:
 ```python
 from ipymarkup import LineMarkup
 
