@@ -13,7 +13,7 @@ $ pip install ipymarkup
 
 ## Usage
 
-Display simple nonoverlaping spans in Jupyter:
+Display simple nonoverlapping spans in Jupyter:
 ```python
 from ipymarkup import show_markup
 
@@ -28,7 +28,7 @@ spans = [
 show_markup(text, spans)
 
 ```
-<img src="i/01.png"/>
+<img src="i/01.png" width="60%"/>
 
 Add labels:
 ```python
@@ -41,9 +41,9 @@ spans = [
 
 show_markup(text, spans)
 ```
-<img src="i/02.png"/>
+<img src="i/02.png" width="60%"/>
 
-There is a number of visualizations (see [docs](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb) for full list). By default `BoxLabelMarkup` is used. In case spans overlap (`PERSON` overlaps `NAME`), switch to `LineMarkup`:
+There is a number of visualizations (see [docs](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb) for full list). By default, `BoxLabelMarkup` is used. In case spans overlap (`PERSON` overlaps `NAME`), switch to `LineMarkup`:
 ```python
 from ipymarkup import LineMarkup
 
@@ -57,13 +57,14 @@ spans = [
 
 show_markup(text, spans, LineMarkup)
 ```
-<img src="i/03.png">
+<img src="i/03.png" width="60%">
 
 Finally to use `ipymarkup` outside of Jupyter, use `AsciiMarkup`:
 ```python
-from ipymarkup import LineMarkup
+from ipymarkup import markup, AsciiMarkup
 
-show_markup(text, spans, AsciiMarkup)
+for line in markup(text, spans, AsciiMarkup).as_ascii:
+    print(line)
 ```
 ```
 South Korean President Moon Jae-in announced in a joint press 
@@ -77,7 +78,7 @@ For more examples and explanation see [ipymarkup documentation](http://nbviewer.
 
 ## License
 
-Source code of `ipymarkup` is distributed under MIT license (allows modification and commercial usage)
+The source code of `ipymarkup` is distributed under MIT license (allows modification and commercial usage)
 
 ## Support
 
