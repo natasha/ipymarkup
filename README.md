@@ -1,11 +1,11 @@
 # ipymarkup [![Build Status](https://travis-ci.org/natasha/ipymarkup.svg?branch=master)](https://travis-ci.org/natasha/ipymarkup) [![Coverage Status](https://coveralls.io/repos/github/natasha/ipymarkup/badge.svg?branch=master)](https://coveralls.io/github/natasha/ipymarkup?branch=master)
 
 NER markup visualization for Jupyter Notebook. 
-<img src="table.png"/>
+<img src="i/table.png"/>
 
 ## Install
 
-`ipymarkup` supports both Python 2.7+ / 3.4+, non Jupyter functionality should work on 2.7+ / 3.3+, PyPy but not tested
+`ipymarkup` supports both Python 2.7+ / 3.4+, non Jupyter functionality should work on 2.7+ / 3.3+, PyPy.
 
 ```bash
 $ pip install ipymarkup
@@ -13,42 +13,65 @@ $ pip install ipymarkup
 
 ## Usage
 
+Display simple nonoverlaping spans in Jupyter:
 ```python
-from ipymarkup import markup, AsciiMarkup
+from ipymarkup import show_markup
 
-text = '0123456789'
+text = 'South Korean President Moon Jae-in announced in a joint press conference on 23 July ...'
 spans = [
-    (1, 2),
-    (4, 7, 'b')
+    (0, 12),
+    (13, 22),
+    (23, 34),
+    (76, 83)
 ]
-markup(text, spans, AsciiMarkup)
-```
-```
-0123456789
- -  b--   
-```
 
+show_markup(text, spans)
+
+```
+<img src="i/01.png"/>
+
+Add labels:
 ```python
-from ipymarkup import Span, AsciiMarkup
-
-text = 'a d a b a a a b c c c f d'
 spans = [
-    Span(0, 13, 'a'),
-    Span(2, 25, 'd'),
-    Span(6, 15, 'b'),
-    Span(16, 21, 'c'),
-    Span(22, 23, 'f'),
+    (0, 12, 'GEO'),
+    (13, 22, 'POSITION'),
+    (23, 34, 'NAME'),
+    (76, 83, 'DATE')
 ]
-AsciiMarkup(text, spans)
 
+show_markup(text, spans)
 ```
-```
-a d a b a a a b c c c f d
-a------------   c---- f  
-  d----------------------
-      b--------          
-```
+<img src="i/02.png"/>
 
+There is a number of visualizations (see [docs](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb) for full list). By default `BoxLabelMarkup` is used. In case spans overlap (`PERSON` overlaps `NAME`), switch to `LineMarkup`:
+```python
+from ipymarkup import LineMarkup
+
+spans = [
+    (0, 12, 'GEO'),
+    (13, 22, 'POSITION'),
+    (23, 34, 'NAME'),
+    (0, 34, 'PERSON'),
+    (76, 83, 'DATE')
+]
+
+show_markup(text, spans, LineMarkup)
+```
+<img src="i/03.png">
+
+Finally to use `ipymarkup` outside of Jupyter, use `AsciiMarkup`:
+```python
+from ipymarkup import LineMarkup
+
+show_markup(text, spans, AsciiMarkup)
+```
+```
+South Korean President Moon Jae-in announced in a joint press 
+GEO--------- POSITION- NAME-------                            
+PERSON----------------------------                            
+conference on 23 July ...
+              DATE---    
+```
 
 For more examples and explanation see [ipymarkup documentation](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb).
 
