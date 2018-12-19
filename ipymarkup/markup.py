@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+import re
 from textwrap import TextWrapper
 from cgi import escape
 
@@ -249,11 +250,10 @@ class Wrapper(TextWrapper):
         )
 
     def __call__(self, text):
-        start = 0
-        lines = text.splitlines()
-        for index, line in enumerate(lines):
-            if index < len(lines) - 1:
-                line = line + ' '  # replace \n with ' '
+        matches = re.finditer(r'([^\n]+)', text)
+        for match in matches:
+            start = match.start()
+            line = match.group(1)
             for fold in self.wrap(line):
                 stop = start + len(fold)
                 yield start, stop, fold
