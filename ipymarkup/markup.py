@@ -5,14 +5,10 @@ import re
 from textwrap import TextWrapper
 from cgi import escape
 
-from .compat import str, range
+from .compat import str, range, basestring
 from .utils import Record, assert_type
 from .multiline import Multiline, get_multilines
 from .color import (
-    LINE,
-    BACKGROUND,
-    DARKER,
-    EVEN_DARKER,
     Soft,
     Shade
 )
@@ -21,13 +17,14 @@ from .color import (
 __all__ = [
     'Span',
     'BoxMarkup',
-    'BoxLabelMarkup',
     'LineMarkup',
-    'LineLabelMarkup',
     'AsciiMarkup',
 
     'markup',
-    'show_markup'
+    'show_markup',
+    'show_box_markup',
+    'show_line_markup',
+    'show_ascii_markup'
 ]
 
 
@@ -52,22 +49,15 @@ class Span(Record):
             if self.stop != other.stop:
                 return self.stop < other.stop
             else:
-                if self.type != other.type:
-                    if self.type is None:
-                        return True
-                    if other.type is None:
-                        return False
-                    return self.type < other.type
-                else:
-                    return False  # eq
+                return False  # eq
 
 
-class Html(object):
+class Html:
     def _repr_html_(self):
         return ''.join(self.as_html)
 
 
-class Ascii(object):
+class Ascii:
     def _repr_pretty_(self, printer, cycle):
         for line in self.as_ascii:
             printer.text(line)
@@ -78,14 +68,15 @@ class Markup(Record):
     __attributes__ = ['text', 'spans']
 
     def __init__(self, text, spans):
-        self.text = str(text)
-        for span in spans:
+        assert_type(text, basestring)
+        self.text = text
+        self.spans = list(spans)
+        for span in self.spans:
             assert_type(span, Span)
-        self.spans = sorted(spans)
         self.multilines = list(get_multilines(self.spans))
 
 
-def chunk_(text, spans):
+def chunk(text, spans):
     previous = 0
     for span in spans:
         start, stop, _ = span
@@ -95,15 +86,7 @@ def chunk_(text, spans):
     yield text[previous:], None
 
 
-def chunk(text, spans):
-    for chunk, span in chunk_(text, spans):
-        yield escape(chunk), span
-
-
 class BoxMarkup(Html, Markup):
-    label = False
-    color = True
-
     @property
     def as_html(self):
         yield (
@@ -111,205 +94,207 @@ class BoxMarkup(Html, Markup):
             'style="white-space: pre-wrap">'
         )
         for text, span in chunk(self.text, self.spans):
+            text = escape(text)
             if not span:
                 yield text
                 continue
 
-            if self.color:
-                background = BACKGROUND[span.type]
-                border = DARKER[background]
-                label = EVEN_DARKER[background]
-            else:
-                background = Shade.YELLOW
-                border = Shade.DARK_YELLOW
-                label = Shade.DARKER_YELLOW
             yield (
                 '<span style="'
-                'padding: 0.15em; '
-                'border-radius: 0.25em; '
+                'padding: 2px; '
+                'border-radius: 4px; '
                 'border: 1px solid {border}; '
                 'background: {background}'
                 '">'.format(
-                    background=background,
-                    border=border
+                    background=Shade.YELLOW,
+                    border=Shade.DARK_YELLOW
                 )
             )
             yield text
-            if self.label and span.type:
+            if span.type:
                 yield (
-                    '<sup style="'
+                    '<span style="'
+                    'vertical-align: middle; '
+                    'margin-left: 2px; '
                     'font-size: 0.7em; '
                     'color: {color};'
                     '">'.format(
-                        color=label
+                        color=Shade.DARKER_YELLOW
                     )
                 )
                 yield span.type
-                yield '</sup>'
+                yield '</span>'
             yield '</span>'
         yield '</div>'
 
 
-class BoxLabelMarkup(BoxMarkup):
-    label = True
-    color = False
+def Wrapper(width):
+    return TextWrapper(
+        width,
+        expand_tabs=False,
+        replace_whitespace=False,
+        drop_whitespace=False
+    ).wrap
+
+
+def fold(text, width):
+    wrapper = Wrapper(width)
+    matches = re.finditer(r'([^\n\r]+)', text)
+    for match in matches:
+        start = match.start()
+        line = match.group(1)
+        for fold in wrapper(line):
+            stop = start + len(fold)
+            yield start, stop, fold
+            start = stop
+
+
+def distribute(folds, multilines):
+    index = 0
+    for start, stop, line in folds:
+        slices = []
+        while index < len(multilines):
+            multi = multilines[index]
+            if multi.start >= stop:
+                break
+            slice = Multiline(
+                max(multi.start, start) - start,
+                min(multi.stop, stop) - start,
+                multi.lines
+            )
+            slices.append(slice)
+            if multi.stop <= stop:
+                index += 1
+            else:
+                break
+        yield start, line, slices
+
+
+def wrap(text, multilines, width):
+    folds = fold(text, width)
+    return distribute(folds, multilines)
 
 
 class LineMarkup(Html, Markup):
+    def __init__(self, text, spans,
+                 width=80, line_gap=3, line_width=2,
+                 label_size=6, background='white'):
+        Markup.__init__(self, text, spans)
+        assert_type(width, int)
+        self.width = width
+        assert_type(line_gap, int)
+        self.line_gap = line_gap
+        assert_type(line_width, int)
+        self.line_width = line_width
+        assert_type(label_size, int)
+        self.label_size = label_size
+        assert_type(background, basestring)
+        self.background = background
+        self.level_width = line_gap + line_width
+
     @property
     def as_html(self):
         yield (
             '<div class="tex2jax_ignore" style="'
-            'line-height: 1.6em; '
             'white-space: pre-wrap'
             '">'
         )
-        for text, multi in chunk(self.text, self.multilines):
-            if not multi:
-                yield text
-                continue
+        for offset, line, multilines in wrap(self.text, self.multilines, self.width):
+            yield '<div>'  # line block
+            for text, multi in chunk(line, multilines):
+                text = escape(text)
+                if not multi:
+                    yield (
+                        '<span style="display: inline-block; '
+                        'vertical-align: top">'
+                    )
+                    yield text
+                    yield '</span>'
+                    continue
 
-            for line in multi.lines:
-                padding = 1 + line.level * 3
-                color = LINE[line.type]
+                level = max(_.level for _ in multi.lines)
+                margin = (level + 1) * self.level_width
                 yield (
-                    '<span style="'
-                    'border-bottom: 2px solid {color}; '
-                    'padding-bottom: {padding}px'
-                    '">'.format(
-                        padding=padding,
-                        color=color
+                    '<span style="display: inline-block; '
+                    'vertical-align: top; position: relative; '
+                    'margin-bottom: {margin}px">'.format(
+                        margin=margin
                     )
                 )
-            yield text
-            for _ in multi.lines:
-                yield '</span>'
 
-        yield '</div>'
-
-
-class LineLabelMarkup(Html, Markup):
-    @property
-    def as_html(self):
-        yield (
-            '<div style="'
-            'line-height: 1.6em; '  # 1.5 is default
-            'white-space: pre-wrap'
-            '">'
-        )
-        for text, multi in chunk(self.text, self.multilines):
-            if not multi:
-                yield text
-                continue
-
-            if not text.strip():
-                yield text
-                continue
-
-            yield (
-                '<span style="'
-                'border-bottom: 2px solid {color}; '
-                'padding-bottom: 1px'
-                '">'.format(
-                    color=Soft.BLUE
-                )
-            )
-            yield text
-            yield '</span>'
-
-            yield (
-                '<span style="'
-                'display: inline-block; '
-                'margin-left: 1px; '
-                'font-size: 7px;'
-                '">'
-            )
-            types = [
-                _.type
-                for _ in multi.lines
-                if _.type is not None
-            ]
-            if len(types) == 1:
-                yield types[0]
-            elif len(types) > 1:
                 for line in multi.lines:
-                    yield '<span style="display: block; height: 7px;">'
+                    padding = self.line_gap + line.level * self.level_width
+                    yield (
+                        '<span style="'
+                        'border-bottom: {line_width}px solid {color}; '
+                        'padding-bottom: {padding}px'
+                        '">'.format(
+                            line_width=self.line_width,
+                            padding=padding,
+                            color=Soft.BLUE
+                        )
+                    )
+                yield text
+                for _ in multi.lines:
+                    yield '</span>'
+
+                for line in multi.lines:
+                    if not line.type or offset + multi.start != line.start:
+                        continue
+
+                    bottom = -(line.level + 1) * self.level_width + self.line_width
+                    bottom -= 1  # looks better
+                    yield (
+                        '<span style="background: {background}; '
+                        'font-size: {label_size}px; line-height: 1; '
+                        'position: absolute; left: 0; '
+                        'bottom: {bottom}px">'.format(
+                            label_size=self.label_size,
+                            background=self.background,
+                            bottom=bottom
+                        )
+                    )
                     yield line.type
                     yield '</span>'
-            yield '</span>'
+
+                yield '</span>'  # close relative
+            yield '</div>'  # close line
         yield '</div>'
-
-
-class Wrapper(TextWrapper):
-    def __init__(self, width):
-        TextWrapper.__init__(
-            self, width,
-            expand_tabs=False,
-            replace_whitespace=False,
-            drop_whitespace=False
-        )
-
-    def __call__(self, text):
-        matches = re.finditer(r'([^\n]+)', text)
-        for match in matches:
-            start = match.start()
-            line = match.group(1)
-            for fold in self.wrap(line):
-                stop = start + len(fold)
-                yield start, stop, fold
-                start = stop
 
 
 class AsciiMarkup(Ascii, Markup):
     def __init__(self, text, spans, width=70):
         Markup.__init__(self, text, spans)
-        self.wrapper = Wrapper(width)
+        self.width = width
 
     @property
     def as_ascii(self):
-        index = 0
-        for start, stop, line in self.wrapper(self.text):
-            slices = []
-            while index < len(self.multilines):
-                multi = self.multilines[index]
-                if multi.start >= stop:
-                    break
-                slice = Multiline(
-                    max(multi.start, start),
-                    min(multi.stop, stop),
-                    multi.lines
-                )
-                slices.append(slice)
-                if multi.stop <= stop:
-                    index += 1
-                else:
-                    break
-
+        for offset, line, multilines in wrap(self.text, self.multilines, self.width):
             yield line.replace('\t', ' ')
 
-            if slices:
+            if multilines:
                 height = max(
                     line.level
-                    for slice in slices
-                    for line in slice.lines
+                    for multi in multilines
+                    for line in multi.lines
                 ) + 1
                 width = len(line)
                 matrix = [
                     [' ' for _ in range(width)]
                     for row in range(height)
                 ]
-                for slice in slices:
-                    for line in slice.lines:
-                        for x in range(slice.start, slice.stop):
-                            matrix[line.level][x - start] = '-'
-                for slice in slices:
-                    for line in slice.lines:
-                        if line.type and line.start == slice.start:
+                for multi in multilines:
+                    for line in multi.lines:
+                        for x in range(multi.start, multi.stop):
+                            matrix[line.level][x] = '-'
+                for multi in multilines:
+                    for line in multi.lines:
+                        if line.type and offset + line.start == multi.start:
                             size = line.stop - line.start
-                            space = width - (slice.start - start)
+                            space = width - multi.start
                             type = line.type[:min(size, space)]
                             for x, char in enumerate(type):
-                                x = slice.start - start + x
+                                x = multi.start + x
                                 matrix[line.level][x] = char
                 for row in matrix:
                     yield ''.join(row)
@@ -336,12 +321,23 @@ def prepare_span(span):
     raise TypeError(span)
 
 
-def markup(text, spans, Markup=BoxLabelMarkup):
+def markup(text, spans, Markup=BoxMarkup, **kwargs):
     spans = [prepare_span(_) for _ in spans]
-    return Markup(text, spans)
+    return Markup(text, spans, **kwargs)
 
 
-def show_markup(text, spans, Markup=BoxLabelMarkup):
+def show_markup(text, spans, Markup=BoxMarkup, **kwargs):
     from IPython.display import display
 
-    display(markup(text, spans, Markup))
+    display(markup(text, spans, Markup, **kwargs))
+
+
+show_box_markup = show_markup
+
+
+def show_line_markup(text, spans, Markup=LineMarkup, **kwargs):
+    show_markup(text, spans, Markup, **kwargs)
+
+
+def show_ascii_markup(text, spans, Markup=AsciiMarkup, **kwargs):
+    show_markup(text, spans, Markup, **kwargs)
