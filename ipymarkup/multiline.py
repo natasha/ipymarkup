@@ -17,19 +17,6 @@ class Line(Record):
         self.type = type
         self.level = level
 
-    def __lt__(self, other):
-        if self.level != other.level:
-            return self.level < other.level
-        else:
-            if self.type != other.type:
-                if self.type is None:
-                    return True
-                if other.type is None:
-                    return False
-                return self.type < other.type
-            else:
-                return False  # eq
-
 
 class Multiline(Record):
     __attributes__ = ['start', 'stop', 'lines']
@@ -43,21 +30,29 @@ class Multiline(Record):
 
 
 def get_free_level(intervals):
-    if not intervals:
+    levels = [
+        _.data.level for _ in intervals
+        if _.data.level is not None
+    ]
+    if not levels:
         return 0
-    levels = [_.data.level for _ in intervals]
     if min(levels) > 0:
         return 0
     return max(levels) + 1
 
 
 def get_multilines(spans):
-    # level
     intervals = Intervals()
-    for start, stop, type in sorted(spans):
-        selected = intervals.search(start, stop)
-        level = get_free_level(selected)
-        intervals.addi(start, stop, Line(start, stop, type, level))
+    lines = []
+    for start, stop, type in spans:
+        line = Line(start, stop, type, level=None)
+        intervals.addi(start, stop, line)
+        lines.append(line)
+
+    # level
+    for line in lines:
+        selected = intervals.search(line.start, line.stop)
+        line.level = get_free_level(selected)
 
     # chunk
     intervals.split_overlaps()
@@ -69,5 +64,5 @@ def get_multilines(spans):
 
     for start, stop in sorted(groups):
         lines = groups[start, stop]
-        lines = sorted(lines)
+        lines = sorted(lines, key=lambda _: _.level)
         yield Multiline(start, stop, lines)
