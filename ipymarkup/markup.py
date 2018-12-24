@@ -9,8 +9,8 @@ from .compat import str, range, basestring
 from .utils import Record, assert_type
 from .multiline import Multiline, get_multilines
 from .color import (
-    Soft,
-    Shade
+    YELLOW,
+    SOFT_BLUE
 )
 
 
@@ -41,15 +41,6 @@ class Span(Record):
         if type is not None:
             type = str(type)
         self.type = type
-
-    def __lt__(self, other):
-        if self.start != other.start:
-            return self.start < other.start
-        else:
-            if self.stop != other.stop:
-                return self.stop < other.stop
-            else:
-                return False  # eq
 
 
 class Html:
@@ -87,6 +78,9 @@ def chunk(text, spans):
 
 
 class BoxMarkup(Html, Markup):
+    def __init__(self, text, spans):
+        Markup.__init__(self, text, spans)
+
     @property
     def as_html(self):
         yield (
@@ -106,8 +100,8 @@ class BoxMarkup(Html, Markup):
                 'border: 1px solid {border}; '
                 'background: {background}'
                 '">'.format(
-                    background=Shade.YELLOW,
-                    border=Shade.DARK_YELLOW
+                    background=YELLOW.rgb,
+                    border=YELLOW.darker.rgb
                 )
             )
             yield text
@@ -119,7 +113,7 @@ class BoxMarkup(Html, Markup):
                     'font-size: 0.7em; '
                     'color: {color};'
                     '">'.format(
-                        color=Shade.DARKER_YELLOW
+                        color=YELLOW.darker.darker.rgb
                     )
                 )
                 yield span.type
@@ -177,8 +171,8 @@ def wrap(text, multilines, width):
 
 class LineMarkup(Html, Markup):
     def __init__(self, text, spans,
-                 width=80, line_gap=3, line_width=2,
-                 label_size=6, background='white'):
+                 width=80, line_gap=5, line_width=2,
+                 label_size=8, background='white'):
         Markup.__init__(self, text, spans)
         assert_type(width, int)
         self.width = width
@@ -231,7 +225,7 @@ class LineMarkup(Html, Markup):
                         '">'.format(
                             line_width=self.line_width,
                             padding=padding,
-                            color=Soft.BLUE
+                            color=SOFT_BLUE.rgb
                         )
                     )
                 yield text
