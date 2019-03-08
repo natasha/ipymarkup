@@ -6,7 +6,7 @@ from textwrap import TextWrapper
 from cgi import escape
 
 from .compat import str, range, basestring
-from .utils import Record, assert_type
+from .utils import Record, assert_type, assert_positive
 from .multiline import Multiline, get_multilines
 from .color import (
     YELLOW,
@@ -21,6 +21,10 @@ __all__ = [
     'AsciiMarkup',
 
     'markup',
+    'box_markup',
+    'line_markup',
+    'ascii_markup',
+
     'show_markup',
     'show_box_markup',
     'show_line_markup',
@@ -32,8 +36,8 @@ class Span(Record):
     __attributes__ = ['start', 'stop', 'type']
 
     def __init__(self, start, stop, type=None):
-        assert_type(start, int)
-        assert_type(stop, int)
+        assert_positive(start)
+        assert_positive(stop)
         if start >= stop:
             raise ValueError('expected start < stop')
         self.start = start
@@ -41,6 +45,9 @@ class Span(Record):
         if type is not None:
             type = str(type)
         self.type = type
+
+    def key(self):
+        return self.start
 
 
 class Html:
@@ -64,6 +71,7 @@ class Markup(Record):
         self.spans = list(spans)
         for span in self.spans:
             assert_type(span, Span)
+        self.spans = sorted(spans, key=Span.key)
         self.multilines = list(get_multilines(self.spans))
 
 
@@ -85,7 +93,7 @@ class BoxMarkup(Html, Markup):
     def as_html(self):
         yield (
             '<div class="tex2jax_ignore" '
-            'style="white-space: pre-wrap">'
+            'style="white-space: pre-wrap">'  # render spaces
         )
         for text, span in chunk(self.text, self.spans):
             text = escape(text)
@@ -171,16 +179,16 @@ def wrap(text, multilines, width):
 
 class LineMarkup(Html, Markup):
     def __init__(self, text, spans,
-                 width=80, line_gap=5, line_width=2,
-                 label_size=8, background='white'):
+                 width=80, line_gap=8, line_width=3,
+                 label_size=11, background='white'):
         Markup.__init__(self, text, spans)
-        assert_type(width, int)
+        assert_positive(width)
         self.width = width
-        assert_type(line_gap, int)
+        assert_positive(line_gap)
         self.line_gap = line_gap
-        assert_type(line_width, int)
+        assert_positive(line_width)
         self.line_width = line_width
-        assert_type(label_size, int)
+        assert_positive(label_size)
         self.label_size = label_size
         assert_type(background, basestring)
         self.background = background
@@ -236,11 +244,11 @@ class LineMarkup(Html, Markup):
                     if not line.type or offset + multi.start != line.start:
                         continue
 
-                    bottom = -(line.level + 1) * self.level_width + self.line_width
-                    bottom -= 1  # looks better
+                    bottom = -line.level * self.level_width - self.line_gap
                     yield (
-                        '<span style="background: {background}; '
+                        '<span style="'
                         'font-size: {label_size}px; line-height: 1; '
+                        'text-shadow: 1px 1px 0px {background}; '
                         'position: absolute; left: 0; '
                         'bottom: {bottom}px">'.format(
                             label_size=self.label_size,
@@ -283,7 +291,7 @@ class AsciiMarkup(Ascii, Markup):
                             matrix[line.level][x] = '-'
                 for multi in multilines:
                     for line in multi.lines:
-                        if line.type and offset + line.start == multi.start:
+                        if line.type and offset + multi.start == line.start:
                             size = line.stop - line.start
                             space = width - multi.start
                             type = line.type[:min(size, space)]
@@ -320,18 +328,31 @@ def markup(text, spans, Markup=BoxMarkup, **kwargs):
     return Markup(text, spans, **kwargs)
 
 
+def box_markup(text, spans, **kwargs):
+    return markup(text, spans, BoxMarkup, **kwargs)
+
+
+def line_markup(text, spans, **kwargs):
+    return markup(text, spans, LineMarkup, **kwargs)
+
+
+def ascii_markup(text, spans, **kwargs):
+    return markup(text, spans, AsciiMarkup, **kwargs)
+
+
 def show_markup(text, spans, Markup=BoxMarkup, **kwargs):
     from IPython.display import display
 
     display(markup(text, spans, Markup, **kwargs))
 
 
-show_box_markup = show_markup
+def show_box_markup(text, spans, **kwargs):
+    show_markup(text, spans, BoxMarkup, **kwargs)
 
 
-def show_line_markup(text, spans, Markup=LineMarkup, **kwargs):
-    show_markup(text, spans, Markup, **kwargs)
+def show_line_markup(text, spans, **kwargs):
+    show_markup(text, spans, LineMarkup, **kwargs)
 
 
-def show_ascii_markup(text, spans, Markup=AsciiMarkup, **kwargs):
-    show_markup(text, spans, Markup, **kwargs)
+def show_ascii_markup(text, spans, **kwargs):
+    show_markup(text, spans, AsciiMarkup, **kwargs)

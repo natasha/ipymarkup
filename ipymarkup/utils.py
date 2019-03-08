@@ -12,6 +12,12 @@ def assert_type(item, types):
         ))
 
 
+def assert_positive(item):
+    assert_type(item, int)
+    if item < 0:
+        raise ValueError('expected positive, got %r' % item)
+
+
 class Record(object):
     __attributes__ = []
 
