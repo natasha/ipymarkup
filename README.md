@@ -85,11 +85,20 @@ The source code of `ipymarkup` is distributed under MIT license (allows modifica
 - Chat — https://telegram.me/natural_language_processing
 - Issues — https://github.com/natasha/ipymarkup/issues
 
-
 ## Development
 
 Tests:
 
 ```bash
 make test
+```
+
+Package:
+
+```bash
+make version
+git add ...
+git commit -m 'Up version'
+
+make clean wheel upload
 ```
