@@ -5,6 +5,6 @@ python:
   - "3.6"
 script:
   - sed -i 's/kernelspec//' test.ipynb
-  - pytest --pep8 ipymarkup --nbval --cov ipymarkup --cov-report xml -v test.ipynb
+  - make test
 after_success:
   coveralls

@@ -1,10 +1,14 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
-from .utils import Record
-from .markup import Ascii, Html
-from .color import register as register_color
-from . import *
+from .markup import HtmlMarkup
+from .color import SOFT_PALETTE, PALETTE
+from . import (
+    Span,
+    BoxMarkup,
+    LineMarkup,
+    AsciiMarkup
+)
 
 
 __all__ = [
@@ -62,28 +66,30 @@ def generate_cases():
     yield text, spans
 
 
+def init_palette(palette, types='abcdefghijklmno'):
+    for type in types:
+        palette.register(type)
+    palette.register(None)
+
+
+init_palette(SOFT_PALETTE)
+init_palette(PALETTE)
+
+
 MARKUPS = [
-    BoxMarkup,
-    BoxLabelMarkup,
-    LineMarkup,
-    LineLabelMarkup,
-    AsciiMarkup
+    (BoxMarkup, PALETTE),
+    (LineMarkup, SOFT_PALETTE),
+    (AsciiMarkup, None)
 ]
 
-TYPES = 'abcdefghijklmno'
 
-
-def init_colors():
-    register_color(None)
-    for type in TYPES:
-        register_color(type)
-
-
-def generate_cell(markup):
-    if isinstance(markup, Html):
+def generate_cell(Markup, text, spans, palette):
+    if issubclass(Markup, HtmlMarkup):
+        markup = Markup(text, spans, palette)
         for line in markup.as_html:
             yield line
-    elif isinstance(markup, Ascii):
+    elif issubclass(Markup, AsciiMarkup):
+        markup = Markup(text, spans)
         yield '<pre>'
         yield '\n'.join(markup.as_ascii)
         yield '</pre>'
@@ -91,18 +97,16 @@ def generate_cell(markup):
 
 def generate_row(case):
     text, spans = case
-    for Markup in MARKUPS:
-        markup = Markup(text, spans)
-        yield ''.join(generate_cell(markup))
+    for Markup, palette in MARKUPS:
+        yield ''.join(generate_cell(Markup, text, spans, palette))
 
 
 def generate_header():
-    for markup in MARKUPS:
+    for markup, _ in MARKUPS:
         yield markup.__name__
 
 
 def generate_table():
-    init_colors()
     yield generate_header()
     for case in generate_cases():
         yield generate_row(case)

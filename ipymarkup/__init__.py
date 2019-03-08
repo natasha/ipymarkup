@@ -1,2 +1,2 @@
 
-from .markup import *
+from .markup import *  # noqa

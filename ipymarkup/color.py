@@ -6,53 +6,68 @@ import re
 from .utils import Record, assert_type
 
 
-class Rgb(Record):
-    __attributes__ = ['rgb']
+class Color(Record):
+    __attributes__ = ['value', 'darker']
 
-    def __init__(self, rgb):
-        if not re.match(r'#[0-9a-f]', rgb):
-            raise ValueError('Bad rgb: %r' % rgb)
-        self.rgb = rgb
-        self.dark = None
-
-    @property
-    def darker(self):
-        if not self.dark:
-            raise ValueError('Darker undefined')
-        return self.dark
-
-    @darker.setter
-    def darker(self, color):
-        assert_type(color, Rgb)
-        self.dark = color
+    def __init__(self, value, darker=None):
+        if not re.match(r'^#[0-9a-f]{6}$', value):
+            raise ValueError('Bad rgb: %r' % value)
+        self.value = value
+        if darker:
+            assert_type(darker, Color)
+        self.darker = darker
 
 
-rgb = Rgb
+class Palette(Record):
+    __attributes__ = ['colors']
+
+    def __init__(self, colors):
+        if not colors:
+            raise ValueError('colors empty')
+        for color in colors:
+            assert_type(color, Color)
+        self.colors = colors
+
+        self.cache = {}
+        self.default = self.colors[0]
+        self.index = 0
+
+    def get(self, type):
+        if not type:
+            return self.default
+        if type not in self.cache:
+            index = self.index % len(self.colors)
+            color = self.colors[index]
+            self.cache[type] = color
+            self.index += 1
+        return self.cache[type]
+
+    def register(self, type, color=None):
+        type = str(type)
+        if not color and type in self.cache:
+            return
+        if not color:
+            color = self.get(type)
+        assert_type(color, Color)
+        self.cache[type] = color
 
 
-SOFT_BLUE = rgb('#aec7e8')
-SOFT_ORANGE = rgb('#ffbb78')
-SOFT_GREEN = rgb('#98df8a')
-SOFT_RED = rgb('#ff9896')
-SOFT_PURPLE = rgb('#c5b0d5')
+SOFT_BLUE = Color('#aec7e8')
+SOFT_ORANGE = Color('#ffbb78')
+SOFT_GREEN = Color('#98df8a')
+SOFT_RED = Color('#ff9896')
+SOFT_PURPLE = Color('#c5b0d5')
+SOFT_PALETTE = Palette([
+    SOFT_BLUE, SOFT_ORANGE,
+    SOFT_GREEN, SOFT_RED, SOFT_PURPLE
+])
 
-YELLOW = rgb('#ffffc2')
-YELLOW.darker = rgb('#fdf07c')
-YELLOW.darker.darker = rgb('#c3b95f')
-
-BLUE = rgb('#ecf6ff')
-BLUE.darker = rgb('#c6e1f9')
-BLUE = rgb('#98bbda')
-
-ORANGE = rgb('#fff1e4')
-ORANGE.darker = rgb('#ffd9b4')
-ORANGE.darker.darker = rgb('#ffbb78')
-
-GREEN = rgb('#efffec')
-GREEN.darker = rgb('#afeca3')
-GREEN.darker.darker = rgb('#98df8a')
-
-RED = rgb('#fff1f1')
-RED.darker = rgb('#ffd6d5')
-RED.darker.darker = rgb('#ff9896')
-
+YELLOW = Color('#ffffc2', Color('#fdf07c', Color('#c3b95f')))
+BLUE = Color('#ecf6ff', Color('#c6e1f9', Color('#98bbda')))
+ORANGE = Color('#fff1e4', Color('#ffd9b4', Color('#ffbb78')))
+GREEN = Color('#efffec', Color('#afeca3', Color('#98df8a')))
+RED = Color('#fff1f1', Color('#ffd6d5', Color('#ff9896')))
+PALETTE = Palette([
+    YELLOW, BLUE, ORANGE,
+    GREEN, RED
+])

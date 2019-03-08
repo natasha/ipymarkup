@@ -9,8 +9,9 @@ from .compat import str, range, basestring
 from .utils import Record, assert_type, assert_positive
 from .multiline import Multiline, get_multilines
 from .color import (
-    YELLOW,
-    SOFT_BLUE
+    Palette,
+    PALETTE,
+    SOFT_PALETTE
 )
 
 
@@ -50,18 +51,6 @@ class Span(Record):
         return self.start
 
 
-class Html:
-    def _repr_html_(self):
-        return ''.join(self.as_html)
-
-
-class Ascii:
-    def _repr_pretty_(self, printer, cycle):
-        for line in self.as_ascii:
-            printer.text(line)
-            printer.break_()
-
-
 class Markup(Record):
     __attributes__ = ['text', 'spans']
 
@@ -75,6 +64,18 @@ class Markup(Record):
         self.multilines = list(get_multilines(self.spans))
 
 
+class HtmlMarkup(Markup):
+    __attributes__ = ['text', 'spans', 'palette']
+
+    def __init__(self, text, spans, palette):
+        super(HtmlMarkup, self).__init__(text, spans)
+        assert_type(palette, Palette)
+        self.palette = palette
+
+    def _repr_html_(self):
+        return ''.join(self.as_html)
+
+
 def chunk(text, spans):
     previous = 0
     for span in spans:
@@ -85,9 +86,9 @@ def chunk(text, spans):
     yield text[previous:], None
 
 
-class BoxMarkup(Html, Markup):
-    def __init__(self, text, spans):
-        Markup.__init__(self, text, spans)
+class BoxMarkup(HtmlMarkup):
+    def __init__(self, text, spans, palette=PALETTE):
+        super(BoxMarkup, self).__init__(text, spans, palette)
 
     @property
     def as_html(self):
@@ -101,6 +102,7 @@ class BoxMarkup(Html, Markup):
                 yield text
                 continue
 
+            color = self.palette.get(span.type)
             yield (
                 '<span style="'
                 'padding: 2px; '
@@ -108,8 +110,8 @@ class BoxMarkup(Html, Markup):
                 'border: 1px solid {border}; '
                 'background: {background}'
                 '">'.format(
-                    background=YELLOW.rgb,
-                    border=YELLOW.darker.rgb
+                    background=color.value,
+                    border=color.darker.value
                 )
             )
             yield text
@@ -121,7 +123,7 @@ class BoxMarkup(Html, Markup):
                     'font-size: 0.7em; '
                     'color: {color};'
                     '">'.format(
-                        color=YELLOW.darker.darker.rgb
+                        color=color.darker.darker.value
                     )
                 )
                 yield span.type
@@ -177,11 +179,11 @@ def wrap(text, multilines, width):
     return distribute(folds, multilines)
 
 
-class LineMarkup(Html, Markup):
-    def __init__(self, text, spans,
+class LineMarkup(HtmlMarkup):
+    def __init__(self, text, spans, palette=SOFT_PALETTE,
                  width=80, line_gap=8, line_width=3,
                  label_size=11, background='white'):
-        Markup.__init__(self, text, spans)
+        super(LineMarkup, self).__init__(text, spans, palette)
         assert_positive(width)
         self.width = width
         assert_positive(line_gap)
@@ -226,6 +228,7 @@ class LineMarkup(Html, Markup):
 
                 for line in multi.lines:
                     padding = self.line_gap + line.level * self.level_width
+                    color = self.palette.get(line.type)
                     yield (
                         '<span style="'
                         'border-bottom: {line_width}px solid {color}; '
@@ -233,7 +236,7 @@ class LineMarkup(Html, Markup):
                         '">'.format(
                             line_width=self.line_width,
                             padding=padding,
-                            color=SOFT_BLUE.rgb
+                            color=color.value
                         )
                     )
                 yield text
@@ -264,9 +267,10 @@ class LineMarkup(Html, Markup):
         yield '</div>'
 
 
-class AsciiMarkup(Ascii, Markup):
+class AsciiMarkup(Markup):
     def __init__(self, text, spans, width=70):
-        Markup.__init__(self, text, spans)
+        super(AsciiMarkup, self).__init__(text, spans)
+        assert_positive(width)
         self.width = width
 
     @property
@@ -300,6 +304,11 @@ class AsciiMarkup(Ascii, Markup):
                                 matrix[line.level][x] = char
                 for row in matrix:
                     yield ''.join(row)
+
+    def _repr_pretty_(self, printer, cycle):
+        for line in self.as_ascii:
+            printer.text(line)
+            printer.break_()
 
 
 def prepare_span(span):
