@@ -101,7 +101,8 @@ git add ...
 git commit -m 'Up version'
 
 make tag
-git push -a
+git push
+git push --tags
 
 make clean wheel upload
 ```
