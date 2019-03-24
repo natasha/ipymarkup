@@ -5,13 +5,12 @@ import re
 from textwrap import TextWrapper
 from cgi import escape
 
-from .compat import str, range, basestring
+from .compat import range, basestring
 from .utils import Record, assert_type, assert_positive
 from .multiline import Multiline, get_multilines
-from .color import (
+from .palette import (
     Palette,
     PALETTE,
-    SOFT_PALETTE
 )
 
 
@@ -29,7 +28,7 @@ __all__ = [
     'show_markup',
     'show_box_markup',
     'show_line_markup',
-    'show_ascii_markup'
+    'show_ascii_markup',
 ]
 
 
@@ -44,7 +43,7 @@ class Span(Record):
         self.start = start
         self.stop = stop
         if type is not None:
-            type = str(type)
+            assert_type(type, basestring)
         self.type = type
 
     def key(self):
@@ -65,8 +64,6 @@ class Markup(Record):
 
 
 class HtmlMarkup(Markup):
-    __attributes__ = ['text', 'spans', 'palette']
-
     def __init__(self, text, spans, palette):
         super(HtmlMarkup, self).__init__(text, spans)
         assert_type(palette, Palette)
@@ -110,8 +107,8 @@ class BoxMarkup(HtmlMarkup):
                 'border: 1px solid {border}; '
                 'background: {background}'
                 '">'.format(
-                    background=color.value,
-                    border=color.darker.value
+                    background=color.background.value,
+                    border=color.border.value
                 )
             )
             yield text
@@ -123,7 +120,7 @@ class BoxMarkup(HtmlMarkup):
                     'font-size: 0.7em; '
                     'color: {color};'
                     '">'.format(
-                        color=color.darker.darker.value
+                        color=color.text.value
                     )
                 )
                 yield span.type
@@ -180,7 +177,7 @@ def wrap(text, multilines, width):
 
 
 class LineMarkup(HtmlMarkup):
-    def __init__(self, text, spans, palette=SOFT_PALETTE,
+    def __init__(self, text, spans, palette=PALETTE,
                  width=80, line_gap=8, line_width=3,
                  label_size=11, background='white'):
         super(LineMarkup, self).__init__(text, spans, palette)
@@ -236,7 +233,7 @@ class LineMarkup(HtmlMarkup):
                         '">'.format(
                             line_width=self.line_width,
                             padding=padding,
-                            color=color.value
+                            color=color.line.value
                         )
                     )
                 yield text
