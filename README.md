@@ -1,7 +1,8 @@
 # ipymarkup [![Build Status](https://travis-ci.org/natasha/ipymarkup.svg?branch=master)](https://travis-ci.org/natasha/ipymarkup) [![Coverage Status](https://coveralls.io/repos/github/natasha/ipymarkup/badge.svg?branch=master)](https://coveralls.io/github/natasha/ipymarkup?branch=master)
 
 NER markup visualization for Jupyter Notebook. 
-<img src="i/table.svg"/>
+
+<img src="i/table.svg" width="100%"/>
 
 ## Install
 
@@ -20,7 +21,7 @@ text = 'В мероприятии примут участие не только 
 spans = [(102, 116, 'PER'), (186, 194, 'LOC'), (196, 199, 'LOC'), (202, 214, 'PER'), (254, 268, 'LOC'), (271, 283, 'PER'), (324, 342, 'ORG'), (345, 352, 'LOC'), (355, 365, 'PER'), (445, 455, 'ORG'), (456, 468, 'PER'), (470, 478, 'LOC')]
 show_ascii_markup(text, spans)
 ```
-<img src="i/03.svg">
+<img src="i/03.svg" width="500">
 
 Same visualization in color:
 ```python
