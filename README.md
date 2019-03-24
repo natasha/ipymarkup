@@ -13,66 +13,47 @@ $ pip install ipymarkup
 
 ## Usage
 
-Display simple nonoverlapping spans in Jupyter:
 ```python
-from ipymarkup import show_markup
+from ipymarkup import show_ascii_markup
 
-text = 'South Korean President Moon Jae-in announced in a joint press conference on 23 July ...'
-spans = [
-    (0, 12),
-    (13, 22),
-    (23, 34),
-    (76, 83)
-]
-
-show_markup(text, spans)
-
+text = 'В мероприятии примут участие не только российские учёные, но и зарубежные исследователи, в том числе, Крис Хелмбрехт - управляющий директор и совладелец креативного агентства Kollektiv (Германия, США), Ннека Угбома - руководитель проекта Mushroom works (Великобритания), Гергей Ковач - политик и лидер субкультурной партии «Dog with two tails» (Венгрия), Георг Жено - немецкий режиссёр, один из создателей экспериментального театра «Театр.doc», Театра им. Йозефа Бойса (Германия).'
+spans = [(102, 116, 'PER'), (186, 194, 'LOC'), (196, 199, 'LOC'), (202, 214, 'PER'), (254, 268, 'LOC'), (271, 283, 'PER'), (324, 342, 'ORG'), (345, 352, 'LOC'), (355, 365, 'PER'), (445, 455, 'ORG'), (456, 468, 'PER'), (470, 478, 'LOC')]
+show_ascii_markup(text, spans)
 ```
-> <img src="i/01.png" width="55%"/>
-
-Add labels:
+```
+В мероприятии примут участие не только российские учёные, но и 
+зарубежные исследователи, в том числе, Крис Хелмбрехт - управляющий 
+                                       PER-----------               
+директор и совладелец креативного агентства Kollektiv (Германия, США),
+                                                       LOC-----  LOC  
+ Ннека Угбома - руководитель проекта Mushroom works (Великобритания), 
+ PER---------                                        LOC-----------   
+Гергей Ковач - политик и лидер субкультурной партии «Dog with two 
+PER---------                                         ORG----------
+tails» (Венгрия), Георг Жено - немецкий режиссёр, один из создателей 
+-----   LOC----   PER-------                                         
+экспериментального театра «Театр.doc», Театра им. Йозефа Бойса 
+                                       ORG------- PER--------- 
+(Германия).
+ LOC-----  
+```
+Same visualization in color:
 ```python
-spans = [
-    (0, 12, 'GEO'),
-    (13, 22, 'POSITION'),
-    (23, 34, 'NAME'),
-    (76, 83, 'DATE')
-]
+from ipymarkup import show_box_markup
+from ipymarkup.palette import palette, BLUE, RED, GREEN
 
-show_markup(text, spans)
+show_box_markup(text, spans, palette=palette(PER=BLUE, ORG=RED, LOC=GREEN))
 ```
-> <img src="i/02.png" width="55%"/>
+> <img src="i/01.png"/>
 
-There is a number of visualizations (see [docs](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb#Visualizations) for full list). By default, `BoxLabelMarkup` is used. In case spans overlap (`PERSON` overlaps `NAME`), switch to `LineMarkup`:
+In case spans overlap:
 ```python
-from ipymarkup import LineMarkup
+from ipymarkup import show_line_markup
 
-spans = [
-    (0, 12, 'GEO'),
-    (13, 22, 'POSITION'),
-    (23, 34, 'NAME'),
-    (0, 34, 'PERSON'),
-    (76, 83, 'DATE')
-]
-
-show_markup(text, spans, LineMarkup)
+spans = [(102, 200, 'PERSON'), (119, 139, 'PERSONPROPERTY'), (142, 200, 'PERSONPROPERTY'), (153, 200, 'ORGANIZATION'), (186, 194, 'GEO'), (196, 199, 'GEO'), (202, 252, 'PERSON'), (217, 252, 'PERSONPROPERTY'), (254, 268, 'GEO'), (296, 353, 'PERSONPROPERTY'), (302, 353, 'ORGANIZATION'), (345, 352, 'GEO'), (355, 385, 'PERSON'), (368, 385, 'PERSONPROPERTY'), (406, 443, 'ORGANIZATION'), (445, 479, 'ORGANIZATION'), (470, 478, 'GEO')]
+show_line_markup(text, spans, palette=palette(BLUE))
 ```
-> <img src="i/03.png" width="55%">
-
-Finally to use `ipymarkup` outside of Jupyter, use `AsciiMarkup`:
-```python
-from ipymarkup import markup, AsciiMarkup
-
-for line in markup(text, spans, AsciiMarkup).as_ascii:
-    print(line)
-```
-```
-South Korean President Moon Jae-in announced in a joint press 
-GEO--------- POSITION- NAME-------                            
-PERSON----------------------------                            
-conference on 23 July ...
-              DATE---    
-```
+> <img src="i/02.png">
 
 For more examples and explanation see [ipymarkup documentation](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb).
 
