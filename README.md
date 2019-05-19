@@ -64,10 +64,6 @@ Package:
 
 ```bash
 make version
-git add ...
-git commit -m 'Up version'
-
-make tag
 git push
 git push --tags
 
