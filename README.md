@@ -1,4 +1,4 @@
-<img src="i/logo.svg" height="75">
+<img src="https://github.com/natasha/natasha-logos/blob/master/ipymarkup.svg">
 
 [![Build Status](https://travis-ci.org/natasha/ipymarkup.svg?branch=master)](https://travis-ci.org/natasha/ipymarkup) [![Coverage Status](https://coveralls.io/repos/github/natasha/ipymarkup/badge.svg?branch=master)](https://coveralls.io/github/natasha/ipymarkup?branch=master)
 
