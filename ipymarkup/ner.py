@@ -2,7 +2,7 @@
 import re
 from collections import defaultdict
 from textwrap import TextWrapper
-from cgi import escape
+from html import escape
 
 from intervaltree import IntervalTree as Intervals
 

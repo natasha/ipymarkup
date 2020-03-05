@@ -1,5 +1,5 @@
 
-from cgi import escape
+from html import escape
 from collections import defaultdict
 
 from intervaltree import IntervalTree as Intervals
