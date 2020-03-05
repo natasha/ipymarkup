@@ -20,3 +20,4 @@ jobs:
       run: pip install -r requirements/ci.txt
     - name: Test
       run: make test
+    - uses: codecov/codecov-action@v1
