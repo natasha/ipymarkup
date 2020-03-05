@@ -1,7 +1,5 @@
-# common
 intervaltree==2.1.0
 
-# dev
 pytest==3.2.1
 pytest-flakes==4.0.0
 pytest-pep8==1.0.6
