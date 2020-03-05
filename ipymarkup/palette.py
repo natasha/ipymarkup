@@ -4,21 +4,7 @@ from __future__ import unicode_literals
 import re
 
 from .compat import basestring
-from .utils import Record, assert_type
-
-
-__all__ = [
-    'BLUE',
-    'GREEN',
-    'RED',
-    'ORANGE',
-    'PURPLE',
-    'BROWN',
-
-    'palette',
-    'Palette',
-    'PALETTE'
-]
+from .record import Record
 
 
 ##########
@@ -85,16 +71,11 @@ material = MaterialRgb
 class Color(Record):
     __attributes__ = ['name']
 
-    def __init__(self, name, background, border, text, line):
-        assert_type(name, basestring)
+    def __init__(self, name, background=None, border=None, text=None, line=None):
         self.name = name
-        assert_type(background, Rgb)
         self.background = background
-        assert_type(border, Rgb)
         self.border = border
-        assert_type(text, Rgb)
         self.text = text
-        assert_type(line, Rgb)
         self.line = line
 
 
@@ -140,6 +121,11 @@ BROWN = Color(
     text=material('Brown', '300'),
     line=material('Brown', '200')
 )
+GREY = Color(
+    'grey',
+    text=material('Grey', '500'),
+    line=material('Grey', '400')
+)
 
 
 #########
@@ -163,25 +149,19 @@ class Palette(Record):
         self.cache = cache
 
     def add(self, color):
-        assert_type(color, Color)
         if color not in self.colors:
             self.colors.append(color)
 
     def get(self, type):
-        if type:
-            assert_type(type, basestring)
         if type not in self.cache:
             if not self.colors:
-                raise ValueError('empty palette, type: %s' % type)
+                raise ValueError('empty palette')
             index = len(self.cache) % len(self.colors)
             color = self.colors[index]
             self.cache[type] = color
         return self.cache[type]
 
     def set(self, type, color):
-        if type:
-            assert_type(type, basestring)
-        assert_type(color, Color)
         self.cache[type] = color
 
 
