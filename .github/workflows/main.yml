@@ -19,4 +19,4 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements/ci.txt
     - name: Test
-      run: make ci
+      run: make test
