@@ -2,22 +2,6 @@
 from __future__ import unicode_literals
 
 
-def assert_type(item, types):
-    if not isinstance(item, types):
-        if not isinstance(types, tuple):
-            types = [types]
-        raise TypeError('expected {types}, got {type}'.format(
-            types=' or '.join(_.__name__ for _ in types),
-            type=type(item).__name__
-        ))
-
-
-def assert_positive(item):
-    assert_type(item, int)
-    if item < 0:
-        raise ValueError('expected positive, got %r' % item)
-
-
 class Record(object):
     __attributes__ = []
 
