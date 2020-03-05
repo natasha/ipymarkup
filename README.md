@@ -8,7 +8,7 @@ Collection of NLP visualizations for NER and syntax tree markup
 
 ## Install
 
-`ipymarkup` supports Python 2.7+, Python 3.4+ and PyPy.
+`ipymarkup` supports Python 3.4+.
 
 ```bash
 $ pip install ipymarkup
