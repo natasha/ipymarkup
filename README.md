@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/natasha/ipymarkup/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/natasha/ipymarkup/branch/master/graph/badge.svg)](https://codecov.io/gh/natasha/ipymarkup)
 
-Collection of NLP vizualizations for NER and syntax tree markup
+Collection of NLP visualizations for NER and syntax tree markup
 
 <img src="table.png"/>
 
