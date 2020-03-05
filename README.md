@@ -1,6 +1,6 @@
 <img src="https://github.com/natasha/natasha-logos/blob/master/ipymarkup.svg">
 
-[![Build Status](https://travis-ci.org/natasha/ipymarkup.svg?branch=master)](https://travis-ci.org/natasha/ipymarkup) [![Coverage Status](https://coveralls.io/repos/github/natasha/ipymarkup/badge.svg?branch=master)](https://coveralls.io/github/natasha/ipymarkup?branch=master)
+![CI](https://github.com/natasha/ipymarkup/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/natasha/ipymarkup/branch/master/graph/badge.svg)](https://codecov.io/gh/natasha/ipymarkup)
 
 Collection of NLP vizualizations for NER and syntax tree markup
 
