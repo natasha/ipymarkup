@@ -196,5 +196,6 @@ def palette(*args, **kwargs):
     cache.update(kwargs)
     for type, color in cache.items():
         color = prepare_color(color)
+        palette.add(color)
         palette.set(type, color)
     return palette
