@@ -12,7 +12,7 @@ test:
 	pytest \
 		--pep8 --flakes ipymarkup \
 		--nbval --current-env \
-		--cov-report term-missing --cov ipymarkup \
+		--cov-report term-missing --cov-report xml --cov ipymarkup \
 		-v test.ipynb docs.ipynb
 
 clean:
