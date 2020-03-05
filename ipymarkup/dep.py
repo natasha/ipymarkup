@@ -1,12 +1,9 @@
-# coding: utf-8
-from __future__ import unicode_literals, print_function
 
 from cgi import escape
 from collections import defaultdict
 
 from intervaltree import IntervalTree as Intervals
 
-from .compat import range
 from .show import show_html
 from .record import Record
 from .palette import GREY

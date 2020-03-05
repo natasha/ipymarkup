@@ -1,5 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals, print_function
 
 import re
 from collections import defaultdict
@@ -8,7 +6,6 @@ from cgi import escape
 
 from intervaltree import IntervalTree as Intervals
 
-from .compat import range
 from .show import show_html
 from .record import Record
 from .palette import PALETTE

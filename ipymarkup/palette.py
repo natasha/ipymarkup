@@ -1,9 +1,6 @@
-# coding: utf-8
-from __future__ import unicode_literals
 
 import re
 
-from .compat import basestring
 from .record import Record
 
 
@@ -175,7 +172,7 @@ def prepare_color(value, colors=PALETTE.colors):
     if isinstance(value, Color):
         return value
 
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         for color in colors:
             if color.name == value:
                 return color
