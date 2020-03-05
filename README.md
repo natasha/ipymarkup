@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/natasha/ipymarkup/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/natasha/ipymarkup/branch/master/graph/badge.svg)](https://codecov.io/gh/natasha/ipymarkup)
 
-Collection of NLP visualizations for NER and syntax tree markup
+Collection of NLP visualizations for NER and syntax tree markup. Similar to Spacy <a href="https://explosion.ai/demos/displacy">displaCy</a> and <a href="https://explosion.ai/demos/displacy-ent">displaCy ENT</a>.
 
 <img src="table.png"/>
 
