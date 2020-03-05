@@ -1,19 +1,24 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
-from .markup import HtmlMarkup
-from .palette import PALETTE
-from . import (
+import re
+
+from .show import show_html
+from .ner import (
     Span,
-    BoxMarkup,
-    LineMarkup,
-    AsciiMarkup
+    format_ner_box_markup,
+    format_ner_line_markup,
+    format_ner_ascii_markup,
 )
+from .dep import (
+    Dep,
+    format_dep_markup,
+    format_dep_ascii_markup
+)
+from .palette import PALETTE
 
 
-def is_space(char):
-    import re
-    return re.match(r'\s', char)
+is_space = re.compile(r'^\s$').match
 
 
 def generate_spans(text):
@@ -32,7 +37,7 @@ def generate_spans(text):
             yield Span(start, stop, type=char)
 
 
-def generate_cases():
+def generate_ner_cases():
     text = 'a a a b b c c c'
     spans = list(generate_spans(text))
     yield text, spans
@@ -50,6 +55,33 @@ def generate_cases():
     yield text, spans
 
 
+def word_index(words, char):
+    for index, word in enumerate(words):
+        if char in word:
+            return index
+
+
+def generate_dep_cases():
+    words = 'aaaaa bbbbb ccccc ddddd'.split()
+    deps = []
+    for source in range(4):
+        for target in range(4):
+            if source != target:
+                dep = Dep(source, target, '%d%d' % (source, target))
+                deps.append(dep)
+    yield words, deps
+
+    words = 'aaa bbb ccc ddd eee fff ggg'.split()
+    deps = []
+    for type in 'ab ad dc cb ag ge gf ea'.split():
+        source, target = type
+        source = word_index(words, source)
+        target = word_index(words, target)
+        dep = Dep(source, target, type)
+        deps.append(dep)
+    yield words, deps
+
+
 def init_palette(palette, types='abcdefghijklmno'):
     for type in types:
         palette.get(type)
@@ -59,39 +91,65 @@ def init_palette(palette, types='abcdefghijklmno'):
 init_palette(PALETTE)
 
 
-MARKUPS = [
-    LineMarkup,
-    BoxMarkup,
-    AsciiMarkup,
+NER_FORMATS = [
+    format_ner_box_markup,
+    format_ner_line_markup,
+    format_ner_ascii_markup
+]
+DEP_FORMATS = [
+    format_dep_markup,
+    format_dep_ascii_markup
 ]
 
 
-def generate_cell(Markup, text, spans):
-    markup = Markup(text, spans)
-    if issubclass(Markup, HtmlMarkup):
-        for line in markup.as_html:
-            yield line
-    elif issubclass(Markup, AsciiMarkup):
-        yield '<pre>'
-        yield '\n'.join(markup.as_ascii)
-        yield '</pre>'
+def ascii_html(lines):
+    yield '<pre>'
+    yield '\n'.join(lines)
+    yield '</pre>'
 
 
-def generate_row(case):
+def generate_ner_cell(format, text, spans):
+    lines = format(text, spans)
+    if format == format_ner_ascii_markup:
+        lines = ascii_html(lines)
+    for line in lines:
+        yield line
+
+
+def generate_dep_cell(format, words, deps):
+    lines = format(words, deps)
+    if format == format_dep_ascii_markup:
+        lines = ascii_html(lines)
+    for line in lines:
+        yield line
+
+
+def generate_ner_row(case):
     text, spans = case
-    for Markup in MARKUPS:
-        yield ''.join(generate_cell(Markup, text, spans))
+    for format in NER_FORMATS:
+        yield ''.join(generate_ner_cell(format, text, spans))
 
 
-def generate_header():
-    for markup in MARKUPS:
-        yield markup.__name__
+def generate_dep_row(case):
+    words, deps = case
+    for format in DEP_FORMATS:
+        yield ''.join(generate_dep_cell(format, words, deps))
+
+
+def format_header(formats):
+    for format in formats:
+        header = format.__name__.replace('format', 'show')
+        yield '<div style="margin-top: 2em">%s</div>' % header
 
 
 def generate_table():
-    yield generate_header()
-    for case in generate_cases():
-        yield generate_row(case)
+    yield format_header(NER_FORMATS)
+    for case in generate_ner_cases():
+        yield generate_ner_row(case)
+
+    yield format_header(DEP_FORMATS)
+    for case in generate_dep_cases():
+        yield generate_dep_row(case)
 
 
 def format_table(rows):
@@ -104,13 +162,6 @@ def format_table(rows):
             yield '</td>'
         yield '</tr>'
     yield '</table>'
-
-
-def show_html(lines):
-    from IPython.display import display, HTML
-
-    html = '\n'.join(lines)
-    display(HTML(html))
 
 
 def show_table():
