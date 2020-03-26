@@ -7,13 +7,13 @@ with open('README.md') as file:
 
 
 with open('requirements/main.txt') as file:
-    requirements = list(file)
+    requirements = [_.strip() for _ in file]
 
 
 setup(
     name='ipymarkup',
     version='0.5.0',
-    description='NER markup visualisation for Jupyter Notebook',
+    description='NER, syntax tree markup visualisations for Jupyter Notebook',
     long_description=description,
     long_description_content_type='text/markdown',
     url='https://github.com/natasha/ipymarkup',
@@ -26,7 +26,7 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Visualization',
     ],
-    keywords='ner, markup, jupyter, ipython',
+    keywords='ner, syntax tree, markup, jupyter, ipython',
     packages=find_packages(),
     install_requires=requirements
 )
