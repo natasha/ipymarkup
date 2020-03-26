@@ -18,9 +18,9 @@ test:
 clean:
 	find . \
 		-name '*.pyc' \
-		-o -name '__pycache__' \
-		-o -name '.DS_Store*' \
+		-o -name __pycache__ \
+		-o -name .DS_Store \
 		| xargs rm -rf
 
-	rm -rf dist/ build/ .pytest_cache/ .cache/ \
-		*.egg-info coverage.xml .coverage
+	rm -rf dist/ build/ .pytest_cache/ .cache/ .ipynb_checkpoints/ \
+		*.egg-info/ coverage.xml .coverage
