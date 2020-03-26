@@ -2,11 +2,11 @@
 import re
 
 from .show import show_html
-from .ner import (
+from .span import (
     Span,
-    format_ner_box_markup,
-    format_ner_line_markup,
-    format_ner_ascii_markup,
+    format_span_box_markup,
+    format_span_line_markup,
+    format_span_ascii_markup,
 )
 from .dep import (
     Dep,
@@ -35,7 +35,7 @@ def generate_spans(text):
             yield Span(start, stop, type=char)
 
 
-def generate_ner_cases():
+def generate_span_cases():
     text = 'a a a b b c c c'
     spans = list(generate_spans(text))
     yield text, spans
@@ -89,10 +89,10 @@ def init_palette(palette, types='abcdefghijklmno'):
 init_palette(PALETTE)
 
 
-NER_FORMATS = [
-    format_ner_box_markup,
-    format_ner_line_markup,
-    format_ner_ascii_markup
+SPAN_FORMATS = [
+    format_span_box_markup,
+    format_span_line_markup,
+    format_span_ascii_markup
 ]
 DEP_FORMATS = [
     format_dep_markup,
@@ -106,9 +106,9 @@ def ascii_html(lines):
     yield '</pre>'
 
 
-def generate_ner_cell(format, text, spans):
+def generate_span_cell(format, text, spans):
     lines = format(text, spans)
-    if format == format_ner_ascii_markup:
+    if format == format_span_ascii_markup:
         lines = ascii_html(lines)
     for line in lines:
         yield line
@@ -122,10 +122,10 @@ def generate_dep_cell(format, words, deps):
         yield line
 
 
-def generate_ner_row(case):
+def generate_span_row(case):
     text, spans = case
-    for format in NER_FORMATS:
-        yield ''.join(generate_ner_cell(format, text, spans))
+    for format in SPAN_FORMATS:
+        yield ''.join(generate_span_cell(format, text, spans))
 
 
 def generate_dep_row(case):
@@ -141,9 +141,9 @@ def format_header(formats):
 
 
 def generate_table():
-    yield format_header(NER_FORMATS)
-    for case in generate_ner_cases():
-        yield generate_ner_row(case)
+    yield format_header(SPAN_FORMATS)
+    for case in generate_span_cases():
+        yield generate_span_row(case)
 
     yield format_header(DEP_FORMATS)
     for case in generate_dep_cases():

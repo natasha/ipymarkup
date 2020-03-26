@@ -197,7 +197,7 @@ def wrap_multilines(text, multilines, width):
 ######
 
 
-def format_ner_box_markup(text, spans, palette=PALETTE):
+def format_span_box_markup(text, spans, palette=PALETTE):
     spans = order_spans(prepare_spans(spans))
 
     yield (
@@ -240,9 +240,9 @@ def format_ner_box_markup(text, spans, palette=PALETTE):
     yield '</div>'
 
 
-def format_ner_line_markup(text, spans, palette=PALETTE,
-                           width=80, line_gap=8, line_width=3,
-                           label_size=11, background='white'):
+def format_span_line_markup(text, spans, palette=PALETTE,
+                            width=80, line_gap=8, line_width=3,
+                            label_size=11, background='white'):
     spans = order_spans(prepare_spans(spans))
     multilines = list(get_multilines(spans))
 
@@ -316,7 +316,7 @@ def format_ner_line_markup(text, spans, palette=PALETTE,
     yield '</div>'
 
 
-def format_ner_ascii_markup(text, spans, width=70):
+def format_span_ascii_markup(text, spans, width=70):
     spans = order_spans(prepare_spans(spans))
     multilines = list(get_multilines(spans))
 
@@ -358,16 +358,16 @@ def format_ner_ascii_markup(text, spans, width=70):
 #######
 
 
-def show_ner_box_markup(text, spans, **kwargs):
-    lines = format_ner_box_markup(text, spans, **kwargs)
+def show_span_box_markup(text, spans, **kwargs):
+    lines = format_span_box_markup(text, spans, **kwargs)
     show_html(lines)
 
 
-def show_ner_line_markup(text, spans, **kwargs):
-    lines = format_ner_line_markup(text, spans, **kwargs)
+def show_span_line_markup(text, spans, **kwargs):
+    lines = format_span_line_markup(text, spans, **kwargs)
     show_html(lines)
 
 
-def show_ner_ascii_markup(text, spans, **kwargs):
-    for line in format_ner_ascii_markup(text, spans, **kwargs):
+def show_span_ascii_markup(text, spans, **kwargs):
+    for line in format_span_ascii_markup(text, spans, **kwargs):
         print(line)
