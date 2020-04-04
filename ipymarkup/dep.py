@@ -174,7 +174,7 @@ def section_markup(markup, mode=HTML):
         intervals.addi(arc.start, stop, arc)
 
     for arc in arcs:
-        selected = intervals.search(arc.start, arc.stop)
+        selected = intervals.overlap(arc.start, arc.stop)
         arc.level = get_free_level(selected)
 
     # group

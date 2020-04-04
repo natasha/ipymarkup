@@ -109,7 +109,7 @@ def get_multilines(spans):
 
     # level
     for line in lines:
-        selected = intervals.search(line.start, line.stop)
+        selected = intervals.overlap(line.start, line.stop)
         line.level = get_free_level(selected)
 
     # chunk
