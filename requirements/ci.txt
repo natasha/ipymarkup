@@ -1,4 +1,4 @@
-intervaltree==2.1.0
+intervaltree>=3
 
 pytest==5.2.2
 pytest-cov==2.8.1
