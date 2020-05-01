@@ -83,5 +83,5 @@ make version
 git push
 git push --tags
 
-make clean wheel upload
+make clean package publish
 ```

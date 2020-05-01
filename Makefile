@@ -1,11 +1,11 @@
 
-upload:
+publish:
 	twine upload dist/*
 
 version:
 	bumpversion minor
 
-wheel:
+package:
 	python setup.py sdist bdist_wheel
 
 test:
