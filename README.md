@@ -16,6 +16,8 @@ $ pip install ipymarkup
 
 ## Usage
 
+For more examples and explanation see [ipymarkup documentation](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb).
+
 ```python
 >>> from ipymarkup import show_ner_ascii_markup, show_dep_ascii_markup
 
@@ -60,8 +62,6 @@ tails» (Венгрия), Георг Жено - немецкий режиссё�
     └──────► .            punct
 
 ```
-
-For more examples and explanation see [ipymarkup documentation](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb).
 
 ## Support
 
