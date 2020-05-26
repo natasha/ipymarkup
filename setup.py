@@ -12,7 +12,7 @@ with open('requirements/main.txt') as file:
 
 setup(
     name='ipymarkup',
-    version='0.8.0',
+    version='0.9.0',
     description='NER, syntax tree markup visualisations for Jupyter Notebook',
     long_description=description,
     long_description_content_type='text/markdown',
