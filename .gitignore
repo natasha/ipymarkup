@@ -9,3 +9,4 @@ build
 dist
 .pytest_cache
 .DS_Store
+notes.ipynb

@@ -300,6 +300,7 @@ def format_span_line_markup(text, spans, palette=PALETTE,
                 yield (
                     '<span style="'
                     'font-size: {label_size}px; line-height: 1; '
+                    'white-space: nowrap; '
                     'text-shadow: 1px 1px 0px {background}; '
                     'position: absolute; left: 0; '
                     'bottom: {bottom}px">'.format(
