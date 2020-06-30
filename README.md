@@ -67,6 +67,7 @@ tails» (Венгрия), Георг Жено - немецкий режиссё�
 
 - Chat — https://telegram.me/natural_language_processing
 - Issues — https://github.com/natasha/ipymarkup/issues
+- Commercial support — https://lab.alexkuk.ru
 
 ## Development
 
