@@ -19,11 +19,11 @@ $ pip install ipymarkup
 For more examples and explanation see [ipymarkup documentation](http://nbviewer.jupyter.org/github/natasha/ipymarkup/blob/master/docs.ipynb).
 
 ```python
->>> from ipymarkup import show_ner_ascii_markup, show_dep_ascii_markup
+>>> from ipymarkup import show_span_ascii_markup, show_dep_ascii_markup
 
 >>> text = 'В мероприятии примут участие не только российские учёные, но и зарубежные исследователи, в том числе, Крис Хелмбрехт - управляющий директор и совладелец креативного агентства Kollektiv (Германия, США), Ннека Угбома - руководитель проекта Mushroom works (Великобритания), Гергей Ковач - политик и лидер субкультурной партии «Dog with two tails» (Венгрия), Георг Жено - немецкий режиссёр, один из создателей экспериментального театра «Театр.doc», Театра им. Йозефа Бойса (Германия).'
 >>> spans = [(102, 116, 'PER'), (186, 194, 'LOC'), (196, 199, 'LOC'), (202, 214, 'PER'), (254, 268, 'LOC'), (271, 283, 'PER'), (324, 342, 'ORG'), (345, 352, 'LOC'), (355, 365, 'PER'), (445, 455, 'ORG'), (456, 468, 'PER'), (470, 478, 'LOC')]
->>> show_ascii_markup(text, spans)
+>>> show_span_ascii_markup(text, spans)
 
 В мероприятии примут участие не только российские учёные, но и 
 зарубежные исследователи, в том числе, Крис Хелмбрехт - управляющий 
