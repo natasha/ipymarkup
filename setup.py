@@ -1,12 +1,13 @@
 
 from setuptools import setup, find_packages
+import io
 
 
-with open('README.md') as file:
+with io.open('README.md', encoding='utf8') as file:
     description = file.read()
 
 
-with open('requirements/main.txt') as file:
+with io.open('requirements/main.txt', encoding='utf8') as file:
     requirements = [_.strip() for _ in file]
 
 
