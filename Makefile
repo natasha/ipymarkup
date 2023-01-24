@@ -1,26 +1,11 @@
 
-publish:
-	twine upload dist/*
+lint:
+	flake8 ipymarkup
 
-version:
-	bumpversion minor
+exec-notebooks:
+	python -m nbconvert \
+		--ExecutePreprocessor.kernel_name=python3 \
+		--ClearMetadataPreprocessor.enabled=True \
+		--execute --to notebook --inplace \
+		*.ipynb
 
-package:
-	python setup.py sdist bdist_wheel
-
-test:
-	pytest \
-		--pep8 --flakes ipymarkup \
-		--nbval --current-env \
-		--cov-report term-missing --cov-report xml --cov ipymarkup \
-		-v test.ipynb docs.ipynb
-
-clean:
-	find . \
-		-name '*.pyc' \
-		-o -name __pycache__ \
-		-o -name .DS_Store \
-		| xargs rm -rf
-
-	rm -rf dist/ build/ .pytest_cache/ .cache/ .ipynb_checkpoints/ \
-		*.egg-info/ coverage.xml .coverage

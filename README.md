@@ -1,6 +1,6 @@
 <img src="https://github.com/natasha/natasha-logos/blob/master/ipymarkup.svg">
 
-![CI](https://github.com/natasha/ipymarkup/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/natasha/ipymarkup/branch/master/graph/badge.svg)](https://codecov.io/gh/natasha/ipymarkup)
+![CI](https://github.com/natasha/ipymarkup/actions/workflows/test.yml/badge.svg)
 
 Collection of NLP visualizations for NER and syntax tree markup. Similar to Spacy <a href="https://explosion.ai/demos/displacy">displaCy</a> and <a href="https://explosion.ai/demos/displacy-ent">displaCy ENT</a>.
 
@@ -8,7 +8,7 @@ Collection of NLP visualizations for NER and syntax tree markup. Similar to Spac
 
 ## Install
 
-`ipymarkup` supports Python 3.5+.
+`ipymarkup` supports Python 3.7+.
 
 ```bash
 $ pip install ipymarkup
@@ -73,18 +73,33 @@ For more examples and explanation see [ipymarkup documentation](http://nbviewer.
 
 ## Development
 
-Tests:
+Dev env
 
 ```bash
-make test
+python -m venv ~/.venvs/natasha-ipymarkup
+source ~/.venvs/natasha-ipymarkup/bin/activate
+
+pip install -r requirements/dev.txt
+pip install -e .
+
+python -m ipykernel install --user --name natasha-ipymarkup
 ```
 
-Package:
+Lint + update docs
 
 ```bash
-make version
+make lint
+make exec-notebooks
+```
+
+Release
+
+```bash
+# Update setup.py version
+
+git commit -am 'Up version'
+git tag v0.9.0
+
 git push
 git push --tags
-
-make clean package publish
 ```
