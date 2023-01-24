@@ -1,1 +1,0 @@
-intervaltree>=3  # 'IntervalTree' object has no attribute 'search'

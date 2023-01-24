@@ -7,10 +7,6 @@ with io.open('README.md', encoding='utf8') as file:
     description = file.read()
 
 
-with io.open('requirements/main.txt', encoding='utf8') as file:
-    requirements = [_.strip() for _ in file]
-
-
 setup(
     name='ipymarkup',
     version='0.9.0',
@@ -29,5 +25,8 @@ setup(
     ],
     keywords='ner, syntax tree, markup, jupyter, ipython',
     packages=find_packages(),
-    install_requires=requirements
+    install_requires=[
+        # 'IntervalTree' object has no attribute 'search'
+        'intervaltree>=3'
+    ]
 )
